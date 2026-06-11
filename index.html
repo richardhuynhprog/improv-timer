@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improv Timer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+body {
+    background: linear-gradient(135deg, #e80cbc 0%, #7F77DD 100%);
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1rem;
+}
+
+.stage-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.timer-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    width: 320px;
+    max-width: 90%;
+    text-align: center;
+    border: 4px solid #1dc069;
+    box-shadow: 8px 8px 0px #1dc069;
+}
+
+.topic-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7F77DD;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 0.75rem;
+}
+
+.topic-title {
+    font-family: 'Bangers', Impact, sans-serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #e80cbc;
+    letter-spacing: 1px;
+    margin: 0 0 1.5rem;
+    line-height: 1.2;
+    min-height: 3rem;
+}
+
+.timer-display {
+    font-family: 'Bangers', Impact, sans-serif;
+    font-size: 6rem;
+    font-weight: 400;
+    color: #1dc069;
+    letter-spacing: 4px;
+    line-height: 1;
+}
+
+.hint {
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+    </style>
+</head>
+<body onclick="requestOrientationPermission()">
+<p class="stage-label">Improv timer</p> 
+<div class="timer-card">
+        <div class="topic-label">Current Topic</div>
+        <h1 class="topic-title" id="topic">Flip phone down to randomize!</h1>
+        
+        <div class="timer-display" id="countdown">30</div>
+    </div>
+    <p class="hint">★ tap screen first to allow motion ★</p>
+    <script>
+
+        let currentTopic = "";
+        const topics = [
+            "A day at the beach",
+            "The last time you were really scared",
+            "Your favorite childhood memory",
+            "A time you got lost",
+            "The best meal you've ever had",
+            "A funny misunderstanding",
+            "Your dream vacation",
+            "A time you overcame a fear",
+            "The most embarrassing moment of your life",
+            "A time you helped someone in need"
+        ];
+        function pickTopic() {
+            const randomIndex = Math.floor(Math.random() * topics.length);
+            currentTopic = topics[randomIndex];
+        }
+        const countdownElement = document.getElementById('countdown');
+        let countdown = 30;
+        countdownElement.textContent = countdown;
+let timerId = null;
+let appState = "idle";
+function startTimer() {
+  
+  clearInterval(timerId); 
+  
+ 
+  countdown = 30; 
+  
+
+timerId = setInterval(() => {
+    countdown--;
+    countdownElement.textContent = countdown; 
+    if (countdown <= 0) {
+        clearInterval(timerId);
+        alert("Time's up!");
+        appState = "idle"; 
+    }
+}, 1000);
+}
+function displayTopic() {
+    document.getElementById('topic').textContent = currentTopic;
+}
+            function handleOrientation(event) {
+                const gamma = event.gamma;
+                const beta = event.beta;
+                
+                if (Math.abs(beta) <10 && Math.abs(gamma) < 10) {
+                    if (appState === "faceDown") {
+                        appState = "faceUp";
+                        displayTopic();
+                        startTimer();
+                    }
+                
+                } else {
+                    if (appState !== "faceDown") {
+                        appState = "faceDown";
+                        pickTopic();
+                    }
+                    
+                }
+            }
+            function requestOrientationPermission() {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                            } else {
+                                alert('Permission to access device orientation was denied.');
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    // Non iOS 13+ devices
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+            }
+            
+    </script>
+
+</body>
+</html>
